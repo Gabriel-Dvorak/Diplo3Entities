@@ -12,8 +12,11 @@ import java.util.Objects;
 @ToString
 public class BaseEntity {
 
-    // Fallback-ID -> Einmalig beim Hasch, Vorteil Transiente Objekte behalten ihren Hasch, Stabil für Callections
-    private transient int systemHashCode = super.hashCode();
+    // Fallback-ID -> Einmalig beim Hasch, Vorteil Transiente Objekte behalten ihren Hasch. Stabil für Callections
+    //private transient int systemHashCode = super.hashCode();
+
+    // Robustere Version: ruft direkt identityHashCode() auf
+    private final int systemHashCode = System.identityHashCode(this);
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
