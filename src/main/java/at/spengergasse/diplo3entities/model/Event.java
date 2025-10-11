@@ -1,5 +1,7 @@
 package at.spengergasse.diplo3entities.model;
 
+import at.spengergasse.diplo3entities.myValueObjects.Capacity;
+import at.spengergasse.diplo3entities.myValueObjects.Description;
 import at.spengergasse.diplo3entities.myValueObjects.Title;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,8 +10,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.ToString;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "event")
@@ -20,23 +20,19 @@ public class Event extends BaseEntity {
     @NotBlank @Size(max = 100)
     private Title title;
 
-    @Column(name = "start_time", nullable = false)
-    private LocalDateTime startTime;
+    @Column(name = "capacity", nullable = false)
+    private Capacity capacity;
 
-    @Column(name = "end_time", nullable = false)
-    private LocalDateTime endTime;
+    @Column(name = "description", unique = false, nullable = false, length = 500)
+    private Description description;
 
     public Event() {
         super();
     }
 
-    public Event(Title title, LocalDateTime startTime, LocalDateTime endTime) {
+    public Event(Title title, Capacity capacity, Description description) {
         this.title = title;
-        this.startTime = startTime;
-        this.endTime = endTime;
-
-        if (!endTime.isAfter(startTime)) {
-            throw new IllegalArgumentException("EndTime must be after StartTime");
-        }
+        this.capacity = capacity;
+        this.description = description;
     }
 }

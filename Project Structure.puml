@@ -1,0 +1,257 @@
+@startuml
+
+top to bottom direction
+
+' Packages
+package "Enums" {
+    enum FrontendArea {
+        HEADER
+        FOOTER
+        SIDEBAR
+        MAIN
+        ABOUT
+    }
+}
+
+package "Validation" {
+    class Guard {
+        --
+        + textLength(text: String, maxLength: int, message: String): String
+        + textLength(text: String, minLength: int, maxLength: int, message: String): String
+        + validatePassword(password: String, minLength: int, maxLength: int, message: String): String
+        + checkLength(text: String, minLength: int, maxLength: int, message: String): String
+        + checkMaxLength(text: String, maxLength: int, message: String): String
+        + checkMinMax(value: int, min: int, max: int, message: String): int
+    }
+}
+
+package "myValueObjects" {
+
+    class Name {
+        - String name
+        --
+        + Name(String name)
+        + Name() <<protected>>
+    }
+
+    class Password {
+        - String password
+        --
+        + Password(String password)
+        + Password() <<protected>>
+    }
+
+    class HasRights {
+        - boolean hasRights
+        --
+        + HasRights(boolean hasRights)
+        + HasRights() <<protected>>
+    }
+
+    class Title {
+        - String title
+        --
+        + Title(String title)
+        + Title() <<protected>>
+    }
+
+    class Capacity {
+        - int capacity
+        --
+        + Capacity(int capacity)
+        + Capacity() <<protected>>
+    }
+
+    class Description {
+        - String description
+        --
+        + Description(String description)
+        + Description() <<protected>>
+        + getDescription() : String
+    }
+
+    class Text {
+        - String text
+        --
+        + Text(String text)
+        + Text() <<protected>>
+    }
+
+    class Position {
+        - int position
+        --
+        + Position(int position)
+        + Position() <<protected>>
+    }
+
+    ' Dependencies zu Guard
+        Name ..> Guard
+        Password ..> Guard
+        Title ..> Guard
+        Capacity ..> Guard
+        Description ..> Guard
+        Text ..> Guard
+        Position ..> Guard
+}
+
+package "Model" {
+
+    class BaseEntity {
+        - id: Long
+        - systemHashCode: int {transient}
+        + hashCode(): int
+        + equals(obj: Object): boolean
+        + isTransistent(): boolean
+    }
+
+    class User {
+        - name: Name
+        - passwort: Password
+        - hasRights: HasRights
+    }
+
+    class Event {
+        - title: Title
+        - capacity: Capacity
+        - description: Description
+    }
+
+    class TextSection {
+        - frontendArea: FrontendArea
+        - text: Text
+        - isTitle: boolean
+        - position: Position
+    }
+
+    ' Inheritance
+    User --|> BaseEntity
+    Event --|> BaseEntity
+    TextSection --|> BaseEntity
+
+    ' Composition zu Value Objects (mit Linienrichtung)
+        User -down-> Name
+        User -down-> Password
+        User -down-> HasRights
+
+        Event -down-> Title
+        Event -down-> Capacity
+        Event -down-> Description
+
+        TextSection -down-> Text
+        TextSection -down-> Position
+        TextSection ..> FrontendArea
+}
+
+package "ModelBean" {
+
+    class UserBean {
+        - name: String
+        - password: String
+        - hasRights: boolean
+    }
+
+    class EventBean {
+        - title: String
+        - capacity: int
+        - description: String
+    }
+
+    class TextSectionBean {
+        - frontendArea: FrontendArea
+        - text: String
+        - isTitle: boolean
+        - position: int
+    }
+
+    ' Inheritance
+    UserBean --|> BaseEntity
+    EventBean --|> BaseEntity
+    TextSectionBean --|> BaseEntity
+
+    TextSection --> FrontendArea
+    TextSectionBean --> FrontendArea
+}
+
+package "Repository" {
+    interface UserRepository {
+        + save(user: User): User
+        + findById(id: Long): User
+        + delete(user: User): void
+    }
+
+    interface EventRepository {
+        + save(event: Event): Event
+        + findById(id: Long): Event
+        + delete(event: Event): void
+    }
+
+    interface TextSectionRepository {
+        + save(section: TextSection): TextSection
+        + findById(id: Long): TextSection
+        + delete(section: TextSection): void
+    }
+
+    ' Dependency auf ModelBeans
+    UserRepository ..> User
+    EventRepository ..> Event
+    TextSectionRepository ..> TextSection
+}
+
+package "Service" {
+    class UserService {
+        + createUser(user: User): User
+        + getUser(id: Long): User
+        + deleteUser(id: Long): void
+    }
+
+    class EventService {
+        + createEvent(event: Event): Event
+        + getEvent(id: Long): Event
+        + deleteEvent(id: Long): void
+    }
+
+    class TextSectionService {
+        + createSection(section: TextSection): TextSection
+        + getSection(id: Long): TextSection
+        + deleteSection(id: Long): void
+    }
+
+    ' Services verwenden Repositories
+    UserService ..> UserRepository
+    EventService ..> EventRepository
+    TextSectionService ..> TextSectionRepository
+}
+
+package "Controller" {
+    class AppController {
+        + createUser(user: User): User
+        + getUser(id: Long): User
+        + deleteUser(id: Long): void
+        + createEvent(event: Event): Event
+        + getEvent(id: Long): Event
+        + deleteEvent(id: Long): void
+        + createSection(section: TextSection): TextSection
+        + getSection(id: Long): TextSection
+        + deleteSection(id: Long): void
+    }
+
+    ' Controller verwendet Services
+    AppController ..> UserService
+    AppController ..> EventService
+    AppController ..> TextSectionService
+}
+
+' Hidden arrows für Layout (ValueObjects unter Entities)
+User ..[#white]-> Name
+User ..[#white]-> Password
+User ..[#white]-> HasRights
+
+Event ..[#white]-> Title
+Event ..[#white]-> Capacity
+Event ..[#white]-> Description
+
+TextSection ..[#white]-> Text
+TextSection ..[#white]-> Position
+
+
+@enduml

@@ -75,4 +75,11 @@ public final class Guard {
 
         return trimmed;
     }
+
+    public static int checkMinMax(int value, int min, int max, String message) {
+        if (value < min || value > max) {
+            throw new IllegalArgumentException(message);
+        }
+        return value;
+    }
 }
