@@ -24,6 +24,7 @@ public class TextSection extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "frontend_area", nullable = false)
+    @Embedded
     private FrontendArea frontendArea;
 
     @Column(name = "text", unique = false, nullable = false, length = 1000)
@@ -36,6 +37,7 @@ public class TextSection extends BaseEntity {
     @Min(1)
     @Max(10)
     @Column(name = "position", nullable = false)
+    @Embedded
     private Position position;
 
     public TextSection() {

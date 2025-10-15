@@ -4,6 +4,7 @@ import at.spengergasse.diplo3entities.myValueObjects.Capacity;
 import at.spengergasse.diplo3entities.myValueObjects.Description;
 import at.spengergasse.diplo3entities.myValueObjects.Title;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
@@ -18,12 +19,15 @@ import lombok.ToString;
 public class Event extends BaseEntity {
     @Column(name = "title", unique = false, nullable = false, length = 100)
     @NotBlank @Size(max = 100)
+    @Embedded
     private Title title;
 
     @Column(name = "capacity", nullable = false)
+    @Embedded
     private Capacity capacity;
 
     @Column(name = "description", unique = false, nullable = false, length = 500)
+    @Embedded
     private Description description;
 
     public Event() {
